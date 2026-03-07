@@ -31,22 +31,32 @@ using UglyToad.PdfPig;
 
 if (args.Length != 1)
 {
-    Console.Error.WriteLine("Usage: dotnet run skills/pdf-extract.cs <rootFolder>");
+    Console.Error.WriteLine("Usage: dotnet run skills/pdf-extract.cs <rootFolder|file.pdf>");
     Environment.Exit(1);
 }
 
-var rootFolder = Path.GetFullPath(args[0]);
+var inputPath = Path.GetFullPath(args[0]);
 
-if (!Directory.Exists(rootFolder))
+IEnumerable<string> pdfFiles;
+
+if (Directory.Exists(inputPath))
 {
-    Console.Error.WriteLine($"Error: directory not found: {rootFolder}");
-    Environment.Exit(1);
+    Console.WriteLine($"Scanning: {inputPath}");
+    Console.WriteLine();
+    pdfFiles = Directory.EnumerateFiles(inputPath, "*.pdf", SearchOption.AllDirectories);
 }
-
-Console.WriteLine($"Scanning: {rootFolder}");
-Console.WriteLine();
-
-var pdfFiles = Directory.EnumerateFiles(rootFolder, "*.pdf", SearchOption.AllDirectories);
+else if (File.Exists(inputPath))
+{
+    Console.WriteLine($"Processing: {inputPath}");
+    Console.WriteLine();
+    pdfFiles = [inputPath];
+}
+else
+{
+    Console.Error.WriteLine($"Error: path not found: {inputPath}");
+    Environment.Exit(1);
+    return;
+}
 
 int total = 0, processed = 0, skipped = 0, errors = 0;
 
