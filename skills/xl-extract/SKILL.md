@@ -1,3 +1,8 @@
+---
+name: xl-extract
+description: Extract Excel worksheets as CSV-formatted .txt files from workbooks or folders
+---
+
 # Excel Extract
 
 Extract each worksheet from Excel workbooks as a CSV-formatted `.txt` file, placed alongside the source file. Accepts a folder (recursive) or a single `.xlsx`/`.xls` file.
@@ -7,7 +12,7 @@ Extract each worksheet from Excel workbooks as a CSV-formatted `.txt` file, plac
 When the user asks to extract or convert Excel spreadsheets to CSV or text, run the following command:
 
 ```bash
-dotnet run skills/xl-extract.cs <rootFolder|file.xlsx>
+dotnet run skills/xl-extract/xl-extract.cs <rootFolder|file.xlsx>
 ```
 
 Replace the argument with the absolute or relative path to a directory or a single Excel file.

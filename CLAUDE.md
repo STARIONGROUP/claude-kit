@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Running Scripts
 
 ```bash
-dotnet run skills/<script-name>.cs [args]
+dotnet run skills/<skill-name>/<script-name>.cs [args]
 dotnet run hooks/<script-name>.cs [args]
 dotnet run mcp/<script-name>.cs
 ```
@@ -42,7 +42,7 @@ Shared code between scripts is included via `#load "../shared/Utility.cs"`.
 
 | Folder | Contents | Invocation |
 |---|---|---|
-| `skills/` | Runnable `.cs` scripts + companion `.md` skill files | `dotnet run skills/name.cs <args>` |
+| `skills/` | Skill subdirectories, each with a `SKILL.md` + `.cs` script | `dotnet run skills/name/name.cs <args>` |
 | `hooks/` | `.cs` scripts triggered by Claude Code hook events | `dotnet run hooks/name.cs` (stdin/stdout JSON) |
 | `mcp/` | `.cs` MCP server adapters using stdio transport | `dotnet run mcp/name.cs` |
 | `commands/` | `.md` slash command definitions | Loaded by Claude Code automatically |
@@ -50,9 +50,9 @@ Shared code between scripts is included via `#load "../shared/Utility.cs"`.
 
 ### Skills
 
-Each skill has two files:
-- `skills/<name>.cs` — the executable script
-- `skills/<name>.md` — Claude Code skill markdown describing when and how to invoke the script
+Each skill lives in its own subdirectory under `skills/`:
+- `skills/<name>/SKILL.md` — Claude Code skill markdown with YAML frontmatter (`name`, `description`) describing when and how to invoke the script
+- `skills/<name>/<name>.cs` — the executable script
 
 ### Hooks
 
@@ -60,7 +60,7 @@ Hook scripts receive a JSON payload via stdin and write responses to stdout. Exi
 
 ### MCP Adapters
 
-MCP servers use `ModelContextProtocol` NuGet package with stdio transport. Register in `.claude/settings.json`:
+MCP servers use `ModelContextProtocol` NuGet package with stdio transport. Register in `~/.claude.json` (user-level) or `.mcp.json` (project-level):
 
 ```json
 {

@@ -13,11 +13,18 @@ dotnet run hooks/<script-name>.cs
 
 | Event | Trigger |
 |---|---|
-| `PreToolCall` | Before Claude calls any tool |
-| `PostToolCall` | After a tool call completes |
+| `PreToolUse` | Before Claude calls any tool |
+| `PostToolUse` | After a tool call completes |
+| `PostToolUseFailure` | After a tool call fails |
 | `UserPromptSubmit` | When the user submits a prompt |
 | `Stop` | When Claude finishes a response turn |
 | `SubagentStop` | When a subagent finishes |
+| `SubagentStart` | When a subagent starts |
+| `SessionStart` | When a Claude Code session starts |
+| `SessionEnd` | When a Claude Code session ends |
+| `PermissionRequest` | When Claude requests permission for a tool |
+| `Notification` | When Claude Code sends a notification |
+| `PreCompact` | Before context is compacted |
 
 ## Convention
 
@@ -27,7 +34,7 @@ hooks/
 └── <event>-<description>.cs
 ```
 
-Example: `pre-tool-call-logger.cs`, `post-tool-call-validator.cs`
+Example: `pre-tool-use-logger.cs`, `post-tool-use-validator.cs`
 
 ## Anatomy of a Hook Script
 
@@ -52,4 +59,4 @@ Environment.Exit(0);
 
 ## References
 
-- [Claude Code Hooks Documentation](https://docs.anthropic.com/en/docs/claude-code/hooks)
+- [Claude Code Hooks Documentation](https://code.claude.com/docs/en/hooks)

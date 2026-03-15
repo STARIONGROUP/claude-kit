@@ -2,6 +2,8 @@
 
 Claude Code slash commands are markdown files that define custom `/command` shortcuts.
 
+> **Note:** In current versions of Claude Code, skills and slash commands share a unified mechanism. Skill `.md` files with YAML frontmatter can also be invoked as slash commands. See `skills/README.md` for details.
+
 ## Structure
 
 Each command is a `.md` file. The filename becomes the command name (e.g., `build.md` → `/build`).
@@ -30,4 +32,4 @@ Use `$ARGUMENTS` as a placeholder for any text the user passes after the command
 
 ## References
 
-- [Claude Code Slash Commands Documentation](https://docs.anthropic.com/en/docs/claude-code/slash-commands)
+- [Claude Code Slash Commands Documentation](https://code.claude.com/docs/en/slash-commands)

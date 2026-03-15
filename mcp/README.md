@@ -11,7 +11,7 @@ dotnet run mcp/<adapter-name>.cs
 
 ## Registering with Claude Code
 
-Add to your `~/.claude/settings.json` (user-level) or `.claude/settings.json` (project-level):
+Add to your `~/.claude.json` (user-level) or `.mcp.json` (project-level):
 
 ```json
 {
@@ -57,4 +57,4 @@ await builder.Build().RunAsync();
 
 - [Model Context Protocol Documentation](https://modelcontextprotocol.io)
 - [MCP C# SDK (ModelContextProtocol NuGet)](https://www.nuget.org/packages/ModelContextProtocol)
-- [Claude Code MCP Documentation](https://docs.anthropic.com/en/docs/claude-code/mcp)
+- [Claude Code MCP Documentation](https://code.claude.com/docs/en/mcp)

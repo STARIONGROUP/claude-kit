@@ -1,3 +1,8 @@
+---
+name: pdf-extract
+description: Extract text from PDF files or folders of PDFs and save as sidecar .txt files
+---
+
 # PDF Extract
 
 Extract text from PDF files — either a single `.pdf` file or all PDFs recursively under a folder — and save each result as a `.txt` file alongside the source PDF.
@@ -7,7 +12,7 @@ Extract text from PDF files — either a single `.pdf` file or all PDFs recursiv
 When the user asks to extract text from a PDF file or from PDFs in a folder, run the following command:
 
 ```bash
-dotnet run skills/pdf-extract.cs <rootFolder|file.pdf>
+dotnet run skills/pdf-extract/pdf-extract.cs <rootFolder|file.pdf>
 ```
 
 Replace `<rootFolder|file.pdf>` with the absolute or relative path to a directory or a single `.pdf` file.
