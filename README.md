@@ -22,6 +22,7 @@ A collection of Claude Code skills, hooks, slash commands, and MCP adapters buil
 |---|---|
 | `pdf-extract` | Extract text from PDF files or folders of PDFs and save as sidecar `.txt` files |
 | `xl-extract` | Extract Excel worksheets as CSV-formatted `.txt` files from workbooks or folders |
+| `switcher` | Switch `.csproj` references between NuGet packages and local projects using a JSON config |
 
 ## Usage
 
@@ -37,6 +38,14 @@ dotnet run skills/pdf-extract/pdf-extract.cs /path/to/single-file.pdf
 ```bash
 dotnet run skills/xl-extract/xl-extract.cs /path/to/spreadsheets
 dotnet run skills/xl-extract/xl-extract.cs /path/to/workbook.xlsx
+```
+
+### Switch .csproj references between NuGet and local projects
+
+```bash
+dotnet run skills/switcher/switcher.cs status path/to/switcher.json
+dotnet run skills/switcher/switcher.cs to-project path/to/switcher.json
+dotnet run skills/switcher/switcher.cs to-nuget path/to/switcher.json
 ```
 
 ### Register an MCP adapter
