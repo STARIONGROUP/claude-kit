@@ -12,10 +12,10 @@ Switch `.csproj` references between NuGet `PackageReference` and local `ProjectR
 When the user asks to switch references between NuGet packages and local projects, run the following command:
 
 ```bash
-dotnet run skills/switcher/switcher.cs <to-project|to-nuget|status> <path-to-switcher.json>
+dotnet run "${CLAUDE_SKILL_DIR}/switcher.cs" <to-project|to-nuget|status> <path-to-switcher.json>
 ```
 
-Replace `<to-project|to-nuget|status>` with the desired command and `<path-to-switcher.json>` with the path to the configuration file.
+`${CLAUDE_SKILL_DIR}` resolves to this skill's directory regardless of where it's installed. Replace `<to-project|to-nuget|status>` with the desired command and `<path-to-switcher.json>` with the path to the configuration file.
 
 ### Config Format
 

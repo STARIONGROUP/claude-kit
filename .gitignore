@@ -1,0 +1,7 @@
+# Local-only Claude Code settings (per-developer permissions, env vars).
+# Should not be committed — each contributor's allowlist is personal.
+.claude/settings.local.json
+
+# .NET build artifacts (generated when running single-file scripts).
+bin/
+obj/

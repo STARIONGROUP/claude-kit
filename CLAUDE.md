@@ -4,14 +4,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Purpose
 
-`claude-kit` is a collection of Claude Code skills, hooks, slash commands, and MCP adapters. All executable scripts are .NET 10 single-file C# programs invoked directly via `dotnet run`.
+`claude-kit` is a collection of Claude Code skills, hooks, and MCP server adapters intended for sharing within a team. All executable scripts are .NET 10 single-file C# programs invoked directly via `dotnet run`. Some exceptions use Python, but the preferred language is C#.
+
+The kit supports two usage patterns:
+1. **In-repo** — clone the repo and work in it; skills under `.claude/skills/` are auto-discovered by Claude Code.
+2. **Copy out** — copy a single skill folder to `~/.claude/skills/<name>/` (user-level) or another project's `.claude/skills/<name>/` (project-level). Each skill is self-contained and location-independent.
+
+## Folder Structure & Discovery
+
+| Path | Contents | Discovery |
+|---|---|---|
+| `.claude/skills/<name>/` | `SKILL.md` + `<name>.cs` | **Auto-discovered** as `/<name>` slash command |
+| `hooks/<name>.cs` | Hook scripts (event handlers) | **Not** auto-discovered — register in `.claude/settings.json` under `hooks` |
+| `mcp/<name>.cs` | MCP stdio server adapters | **Not** auto-discovered — register in `.mcp.json` (project) or `~/.claude.json` (user) |
+| `shared/*.cs` | Utility files for `#load` inclusion | Not run directly |
+
+Anything under `.claude/skills/` is picked up by Claude Code automatically — no manifest, no settings entry. Hooks and MCP servers exist in this repo as a script library; their location is irrelevant to discovery, only the explicit registration is.
 
 ## Running Scripts
 
 ```bash
-dotnet run skills/<skill-name>/<script-name>.cs [args]
-dotnet run hooks/<script-name>.cs [args]
-dotnet run mcp/<script-name>.cs
+# Skill (run from anywhere — ${CLAUDE_SKILL_DIR} is injected by Claude Code)
+dotnet run "${CLAUDE_SKILL_DIR}/<name>.cs" [args]
+
+# Hook (invoked by Claude Code per the matching event in settings.json; reads JSON from stdin)
+dotnet run hooks/<name>.cs
+
+# MCP server (started by Claude Code per .mcp.json; stdio transport)
+dotnet run mcp/<name>.cs
 ```
 
 NuGet packages declared in `#:package` directives are restored automatically on first run.
@@ -36,39 +56,72 @@ using System;
 - Top-level statements only — no explicit `Program` class or `Main` method
 - `await` is supported at top level
 
-Shared code between scripts is included via `#load "../shared/Utility.cs"`.
+Shared code is included via `#load`. Path is relative to the script:
+- From a hook: `#load "../shared/Utility.cs"`
+- From a skill: `#load "../../../shared/Utility.cs"` (skills are nested deeper under `.claude/skills/<name>/`)
 
-## Folder Structure & Conventions
+## Skills
 
-| Folder | Contents | Invocation |
-|---|---|---|
-| `skills/` | Skill subdirectories, each with a `SKILL.md` + `.cs` script | `dotnet run skills/name/name.cs <args>` |
-| `hooks/` | `.cs` scripts triggered by Claude Code hook events | `dotnet run hooks/name.cs` (stdin/stdout JSON) |
-| `mcp/` | `.cs` MCP server adapters using stdio transport | `dotnet run mcp/name.cs` |
-| `commands/` | `.md` slash command definitions | Loaded by Claude Code automatically |
-| `shared/` | Utility `.cs` files for `#load` inclusion | Not run directly |
+Each skill lives in `.claude/skills/<name>/`:
+- `SKILL.md` — YAML frontmatter (`name`, `description`) plus instructions for Claude.
+- `<name>.cs` — the executable script the SKILL.md tells Claude to run.
 
-### Skills
+The `name` in frontmatter and the folder name should match. Skill instructions invoke the bundled script using `${CLAUDE_SKILL_DIR}` so the skill works wherever it's installed:
 
-Each skill lives in its own subdirectory under `skills/`:
-- `skills/<name>/SKILL.md` — Claude Code skill markdown with YAML frontmatter (`name`, `description`) describing when and how to invoke the script
-- `skills/<name>/<name>.cs` — the executable script
+```bash
+dotnet run "${CLAUDE_SKILL_DIR}/<name>.cs" <args>
+```
 
-### Hooks
+### Sharing a skill
 
-Hook scripts receive a JSON payload via stdin and write responses to stdout. Exit code 2 + stderr message blocks the action; exit code 0 allows it.
+A skill folder is the unit of distribution. To share:
 
-### MCP Adapters
+```bash
+# Make available in every project on this machine
+cp -r .claude/skills/<name> ~/.claude/skills/<name>
 
-MCP servers use `ModelContextProtocol` NuGet package with stdio transport. Register in `~/.claude.json` (user-level) or `.mcp.json` (project-level):
+# Drop into another project
+cp -r .claude/skills/<name> /path/to/other-repo/.claude/skills/<name>
+```
+
+No path patching required — `${CLAUDE_SKILL_DIR}` resolves correctly in any of those locations.
+
+## Hooks
+
+Hook scripts receive a JSON event payload via stdin and write a response (or nothing) to stdout. Exit code `0` allows the action; exit code `2` plus a stderr message blocks it.
+
+Hooks are not auto-discovered. Register each one in `.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "dotnet run hooks/pre-bash-guard.cs" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+See `hooks/README.md` for the event vocabulary and the script template.
+
+## MCP Adapters
+
+MCP servers use the `ModelContextProtocol` NuGet package with stdio transport. Register in `.mcp.json` (project-level, checked in) or `~/.claude.json` (user-level):
 
 ```json
 {
   "mcpServers": {
-    "name": { "command": "dotnet", "args": ["run", "mcp/name.cs"] }
+    "<name>": { "command": "dotnet", "args": ["run", "mcp/<name>.cs"] }
   }
 }
 ```
+
+Claude Code starts the process and speaks to it over stdin/stdout.
 
 ## Output & Error Conventions
 

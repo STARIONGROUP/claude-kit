@@ -12,10 +12,10 @@ Extract text from PDF files — either a single `.pdf` file or all PDFs recursiv
 When the user asks to extract text from a PDF file or from PDFs in a folder, run the following command:
 
 ```bash
-dotnet run skills/pdf-extract/pdf-extract.cs <rootFolder|file.pdf>
+dotnet run "${CLAUDE_SKILL_DIR}/pdf-extract.cs" <rootFolder|file.pdf>
 ```
 
-Replace `<rootFolder|file.pdf>` with the absolute or relative path to a directory or a single `.pdf` file.
+`${CLAUDE_SKILL_DIR}` resolves to this skill's directory regardless of where it's installed (project-level `.claude/skills/`, user-level `~/.claude/skills/`, etc.). Replace `<rootFolder|file.pdf>` with the absolute or relative path to a directory or a single `.pdf` file.
 
 ### Behaviour
 

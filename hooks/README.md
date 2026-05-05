@@ -1,46 +1,57 @@
 # Hooks
 
-Hooks are shell commands (or scripts) that Claude Code executes in response to lifecycle events.
+Hooks are commands or scripts that Claude Code executes in response to lifecycle events.
 Scripts in this folder are implemented as .NET 10 single-file C# programs.
 
-## Running a Hook Script
+> **Hook scripts are not auto-discovered.** Putting a `.cs` file in this folder does nothing on its own — you must register it in `.claude/settings.json` (project) or `~/.claude/settings.json` (user) under the `hooks` key.
 
-```bash
-dotnet run hooks/<script-name>.cs
+## Registering a Hook
+
+Each hook entry binds an event (and optional matcher) to a command:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "dotnet run hooks/pre-bash-guard.cs" }
+        ]
+      }
+    ]
+  }
+}
 ```
 
-## Hook Events
+- `matcher` — restricts the hook to specific tool names (e.g. `"Bash"`, `"Edit"`, `"Write"`). Omit to match all.
+- `type: "command"` runs a shell command. Other types include `prompt`, `agent`, `http`, and `mcp_tool`.
+- `command` is invoked from the project root, so relative paths like `hooks/<name>.cs` work.
+
+## Common Hook Events
 
 | Event | Trigger |
 |---|---|
-| `PreToolUse` | Before Claude calls any tool |
+| `SessionStart` | Claude Code session starts |
+| `UserPromptSubmit` | User submits a prompt |
+| `PreToolUse` | Before any tool call |
 | `PostToolUse` | After a tool call completes |
 | `PostToolUseFailure` | After a tool call fails |
-| `UserPromptSubmit` | When the user submits a prompt |
-| `Stop` | When Claude finishes a response turn |
-| `SubagentStop` | When a subagent finishes |
-| `SubagentStart` | When a subagent starts |
-| `SessionStart` | When a Claude Code session starts |
-| `SessionEnd` | When a Claude Code session ends |
-| `PermissionRequest` | When Claude requests permission for a tool |
-| `Notification` | When Claude Code sends a notification |
-| `PreCompact` | Before context is compacted |
+| `PermissionRequest` | Claude requests permission for a tool |
+| `Notification` | Claude Code sends a notification |
+| `SubagentStart` / `SubagentStop` | Subagent lifecycle |
+| `Stop` | Claude finishes a response turn |
+| `PreCompact` / `PostCompact` | Around context compaction |
+| `SessionEnd` | Session ends |
 
-## Convention
-
-```
-hooks/
-├── README.md
-└── <event>-<description>.cs
-```
-
-Example: `pre-tool-use-logger.cs`, `post-tool-use-validator.cs`
+The full list is in the [hooks reference](https://code.claude.com/docs/en/hooks).
 
 ## Anatomy of a Hook Script
 
-Hook scripts receive a JSON payload via stdin and write a JSON response to stdout.
+Hook scripts receive a JSON payload on stdin and write a JSON response (or nothing) on stdout. Exit code `0` allows the action; exit code `2` plus a stderr message blocks it.
 
 ```csharp
+#!/usr/bin/env dotnet-script
 #:sdk Microsoft.NET.Sdk
 #:property TargetFramework net10.0
 
@@ -49,13 +60,14 @@ using System.Text.Json;
 var input = await Console.In.ReadToEndAsync();
 var payload = JsonSerializer.Deserialize<JsonElement>(input);
 
-// Process payload...
+// Inspect the event payload, then either:
+//   - exit 0 to allow,
+//   - exit 2 with a stderr message to block.
 
-// To block the action, exit with code 2 and write reason to stderr
-// To allow, exit with code 0
-Console.Error.WriteLine("Hook reason if blocking");
 Environment.Exit(0);
 ```
+
+To share `#load` utilities, scripts in this folder use the relative path `#load "../shared/<name>.cs"`.
 
 ## References
 

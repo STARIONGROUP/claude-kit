@@ -3,15 +3,11 @@
 MCP (Model Context Protocol) adapters expose tools, resources, and prompts to Claude Code via the MCP standard.
 Adapters in this folder are implemented as .NET 10 single-file C# programs using stdio transport.
 
-## Running an MCP Adapter
-
-```bash
-dotnet run mcp/<adapter-name>.cs
-```
+> **MCP adapters are not auto-discovered.** A `.cs` file in this folder does nothing until it is registered.
 
 ## Registering with Claude Code
 
-Add to your `~/.claude.json` (user-level) or `.mcp.json` (project-level):
+Add to `.mcp.json` at the project root (checked into version control, shared with the team):
 
 ```json
 {
@@ -24,19 +20,18 @@ Add to your `~/.claude.json` (user-level) or `.mcp.json` (project-level):
 }
 ```
 
-## Convention
+For a personal/cross-project adapter, register in `~/.claude.json` instead — or use the CLI:
 
+```bash
+claude mcp add my-adapter dotnet run mcp/my-adapter.cs
 ```
-mcp/
-├── README.md
-└── <adapter-name>.cs
-```
+
+Claude Code starts the process and speaks JSON-RPC 2.0 over stdin/stdout.
 
 ## Anatomy of an MCP Adapter Script
 
-MCP servers communicate via JSON-RPC 2.0 over stdio.
-
 ```csharp
+#!/usr/bin/env dotnet-script
 #:sdk Microsoft.NET.Sdk
 #:property TargetFramework net10.0
 #:package ModelContextProtocol@0.3.0-preview.2
@@ -52,6 +47,8 @@ builder.Services
 
 await builder.Build().RunAsync();
 ```
+
+Verify the `ModelContextProtocol` package version against the [latest on NuGet](https://www.nuget.org/packages/ModelContextProtocol) when adding a new adapter — the SDK is still in preview and the API may shift.
 
 ## References
 
