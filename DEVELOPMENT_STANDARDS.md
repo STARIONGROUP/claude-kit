@@ -9,6 +9,32 @@ Each repository should reference this file from its own `CLAUDE.md` /
 
 ---
 
+## 0. Precedence: automated tooling over prose
+
+- **A configured `.editorconfig` entry, Roslyn analyzer (built-in, StyleCop,
+  `Starion.Analyzers`, or otherwise), or linter rule always wins** over the
+  written rules in this document whenever it covers the same concern. Where
+  the tool's configured behavior and this document's wording disagree, follow
+  the tool.
+- **The rules written out below are the fallback** — they apply only where
+  the repo has no analyzer, linter, or `.editorconfig` entry enforcing the
+  equivalent behavior. As a repo adopts more analyzer coverage, more of this
+  document becomes redundant with tooling rather than contradicted by it —
+  that's the intended direction, not a problem to fix.
+- This applies section-by-section, not document-wide: a repo may have
+  `.editorconfig` coverage for §1 (naming, braces, `var` usage) while still
+  relying on this document's prose for §3–§8 (test conventions, exceptions,
+  docs, workflow, agent boundaries) which are largely judgment calls an
+  analyzer cannot express.
+- Before treating a rule below as binding, check the repo's `.editorconfig`,
+  `Directory.Build.props` / `Directory.Build.targets` (analyzer package
+  references and their configured severity), and any `.globalconfig`. If one
+  of them already governs the point in question, defer to it — don't flag a
+  diff as a violation of this document when it's actually compliant with the
+  repo's own tool configuration.
+
+---
+
 ## 1. C# code style
 
 ### 1.1 Naming & properties
@@ -606,7 +632,10 @@ Cursor, etc.).
 
 - **Mechanical rules** (auto-properties, blank-line-around-braces, LINQ
   preference, naming, collection expressions): enforced by
-  `.editorconfig` + Roslyn analyzers (planned: `Starion.Analyzers` NuGet).
+  `.editorconfig` + Roslyn analyzers where a repo has them configured
+  (planned org-wide: `Starion.Analyzers` NuGet) — see §0. This document's
+  wording is the fallback for repos without that coverage yet, not a
+  second, competing source of truth.
 - **Judgment rules** (test consolidation, exception design, comment style,
   branch workflow, agent boundaries): enforced by code review and by
   reference from each repo's `CLAUDE.md` / `CONTRIBUTING.md`.
