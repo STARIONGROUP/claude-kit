@@ -14,6 +14,7 @@ A team-shareable collection of Claude Code skills, hooks, and MCP adapters built
 | `hooks/<name>.cs` | Hook scripts | Register in `.claude/settings.json` under `hooks` |
 | `mcp/<name>.cs` | MCP stdio servers | Register in `.mcp.json` or `~/.claude.json` |
 | `shared/*.cs` | `#load` includes | Not run directly |
+| `DEVELOPMENT_STANDARDS.md` | Org-wide C#/.NET engineering conventions | Copied into a repo and referenced from its `CLAUDE.md` |
 
 Only `.claude/skills/` is auto-discovered. Hooks and MCP servers must be explicitly registered (see below).
 
@@ -102,6 +103,25 @@ Add to `.mcp.json` (project-level, checked in) or `~/.claude.json` (user-level):
 ```
 
 See `mcp/README.md` for the adapter template.
+
+## Using the Engineering Standards
+
+`DEVELOPMENT_STANDARDS.md` holds org-wide C#/.NET engineering conventions (code style, LINQ, test conventions, exceptions, documentation, repo hygiene, branch/PR workflow, AI agent collaboration, generated-code policy). Unlike skills/hooks/MCP adapters, it isn't invoked — it's meant to be copied into a repo and pulled into that repo's `CLAUDE.md` by reference.
+
+Copy the file into the target repo's root:
+
+```bash
+cp DEVELOPMENT_STANDARDS.md /path/to/other-repo/DEVELOPMENT_STANDARDS.md
+```
+
+Then reference it near the top of that repo's own `CLAUDE.md`:
+
+```markdown
+## Engineering standards (MANDATORY — non-negotiable)
+@DEVELOPMENT_STANDARDS.md
+```
+
+Claude Code resolves the `@` reference relative to the repo root and inlines the file's contents automatically — no manual copy-pasting into `CLAUDE.md`. Project-specific overrides or extensions belong below the reference, in the repo's own `CLAUDE.md`, per the "Project-specific overrides" section of the standards doc itself.
 
 ## License
 
