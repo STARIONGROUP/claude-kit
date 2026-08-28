@@ -18,6 +18,7 @@ The kit supports two usage patterns:
 | `hooks/<name>.cs` | Hook scripts (event handlers) | **Not** auto-discovered — register in `.claude/settings.json` under `hooks` |
 | `mcp/<name>.cs` | MCP stdio server adapters | **Not** auto-discovered — register in `.mcp.json` (project) or `~/.claude.json` (user) |
 | `shared/*.cs` | Utility files for `#load` inclusion | Not run directly |
+| `DEVELOPMENT_STANDARDS.md` | Org-wide C#/.NET engineering conventions | Copied into a repo and referenced from its own `CLAUDE.md` |
 
 Anything under `.claude/skills/` is picked up by Claude Code automatically — no manifest, no settings entry. Hooks and MCP servers exist in this repo as a script library; their location is irrelevant to discovery, only the explicit registration is.
 
